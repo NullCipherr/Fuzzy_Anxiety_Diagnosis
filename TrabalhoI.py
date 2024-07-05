@@ -9,6 +9,7 @@ Created on Fri Jul  5 14:59:09 2024
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
+import matplotlib.pyplot as plt
 
 # Criação das variáveis de entrada
 freq_cardiaca = ctrl.Antecedent(np.arange(60, 121, 1), 'frequencia_cardiaca')
@@ -58,16 +59,19 @@ sistema_ctrl = ctrl.ControlSystem([regra1, regra2, regra3, regra4, regra5])
 simulacao = ctrl.ControlSystemSimulation(sistema_ctrl)
 
 # Função para diagnóstico
-def diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc):
+def diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc, metodo_defuzz):
     simulacao.input['frequencia_cardiaca'] = freq_card
     simulacao.input['nivel_preocupacao'] = nivel_preoc
     simulacao.input['qualidade_sono'] = qual_sono
     simulacao.input['tensao_muscular'] = tensao_musc
     
+    # Alterar método de defuzzificação
+    ansiedade.defuzzify_method = metodo_defuzz
+    
     simulacao.compute()
     
     nivel_ansiedade = simulacao.output['nivel_ansiedade']
-    print(f"Nível de Ansiedade: {nivel_ansiedade:.2f}")
+    print(f"Nível de Ansiedade ({metodo_defuzz}): {nivel_ansiedade:.2f}")
     
     if nivel_ansiedade < 30:
         return "Baixo nível de ansiedade"
@@ -76,49 +80,80 @@ def diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc):
     else:
         return "Alto nível de ansiedade"
 
-def entrada_manual():
+def entrada_manual(metodo_defuzz):
     freq_card = float(input("Digite a frequência cardíaca (60-120 bpm): "))
     nivel_preoc = float(input("Digite o nível de preocupação (0-10): "))
     qual_sono = float(input("Digite a qualidade do sono (0-10, onde 10 é ótimo): "))
     tensao_musc = float(input("Digite o nível de tensão muscular (0-10): "))
     
-    resultado = diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc)
+    resultado = diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc, metodo_defuzz)
     print(resultado)
+    return resultado
 
-def entrada_arquivo():
+def entrada_arquivo(metodo_defuzz, nome_arquivo_saida):
     nome_arquivo = input("Digite o nome do arquivo de entrada (incluindo .txt): ")
     try:
         with open(nome_arquivo, 'r') as arquivo:
             linhas = arquivo.readlines()
-            for i, linha in enumerate(linhas, 1):
-                dados = linha.strip().split(',')
-                if len(dados) != 4:
-                    print(f"Erro na linha {i}: formato inválido")
-                    continue
-                try:
-                    freq_card, nivel_preoc, qual_sono, tensao_musc = map(float, dados)
-                    print(f"\nCaso {i}:")
-                    resultado = diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc)
-                    print(resultado)
-                except ValueError:
-                    print(f"Erro na linha {i}: valores inválidos")
+            with open(nome_arquivo_saida, 'w') as arquivo_saida:
+                for i, linha in enumerate(linhas, 1):
+                    dados = linha.strip().split(',')
+                    if len(dados) != 4:
+                        print(f"Erro na linha {i}: formato inválido")
+                        arquivo_saida.write(f"Erro na linha {i}: formato inválido\n")
+                        continue
+                    try:
+                        freq_card, nivel_preoc, qual_sono, tensao_musc = map(float, dados)
+                        print(f"\nCaso {i}:")
+                        resultado = diagnostico_ansiedade(freq_card, nivel_preoc, qual_sono, tensao_musc, metodo_defuzz)
+                        print(resultado)
+                        arquivo_saida.write(f"Caso {i}: {resultado}\n")
+                    except ValueError:
+                        print(f"Erro na linha {i}: valores inválidos")
+                        arquivo_saida.write(f"Erro na linha {i}: valores inválidos\n")
     except FileNotFoundError:
         print("Arquivo não encontrado.")
+
+def plotar_graficos():
+    fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10, 15))
+    
+    freq_cardiaca.view(ax=axes[0, 0])
+    preocupacao.view(ax=axes[0, 1])
+    sono.view(ax=axes[1, 0])
+    tensao.view(ax=axes[1, 1])
+    ansiedade.view(ax=axes[2, 0])
+    
+    plt.tight_layout()
+    plt.show()
 
 # Menu principal
 while True:
     print("\nSistema de Diagnóstico de Ansiedade")
     print("1. Entrada manual")
     print("2. Carregar de arquivo")
-    print("3. Sair")
+    print("3. Plotar gráficos fuzzy")
+    print("4. Sair")
     
     opcao = input("Escolha uma opção: ")
     
     if opcao == '1':
-        entrada_manual()
+        print("Métodos de defuzzificação disponíveis: centroid, mom, som")
+        metodo_defuzz = input("Escolha o método de defuzzificação: ").strip().lower()
+        if metodo_defuzz not in ['centroid', 'mom', 'som']:
+            print("Método inválido. Usando 'centroid' por padrão.")
+            metodo_defuzz = 'centroid'
+        entrada_manual(metodo_defuzz)
     elif opcao == '2':
-        entrada_arquivo()
+        print("Métodos de defuzzificação disponíveis: centroid, mom, som")
+        metodo_defuzz = input("Escolha o método de defuzzificação: ").strip().lower()
+        if metodo_defuzz not in ['centroid', 'mom', 'som']:
+            print("Método inválido. Usando 'centroid' por padrão.")
+            metodo_defuzz = 'centroid'
+        nome_arquivo_saida = input("Digite o nome do arquivo de saída (incluindo .txt): ")
+        entrada_arquivo(metodo_defuzz, nome_arquivo_saida)
     elif opcao == '3':
+        plotar_graficos()
+    elif opcao == '4':
         print("Encerrando o programa.")
         break
     else:
