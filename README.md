@@ -14,8 +14,8 @@ Bem-vindo ao repositório do **Sistema de Diagnóstico de Ansiedade Fuzzy**! Est
 1. **Clone o Repositório**:
 
    ```sh
-   git clone https://github.com/seu-usuario/sistema-diagnostico-ansiedade-fuzzy.git
-   cd sistema-diagnostico-ansiedade-fuzzy
+   git clone https://github.com/NullCipherr/Fuzzy_Anxiety_Diagnosis.git
+   cd Fuzzy_Anxiety_Diagnosis
 
    ```
 
@@ -49,4 +49,5 @@ Bem-vindo ao repositório do **Sistema de Diagnóstico de Ansiedade Fuzzy**! Est
     ```
 
 ## Contribuição 🤝
+
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests.
