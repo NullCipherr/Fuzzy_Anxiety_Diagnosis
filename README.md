@@ -22,25 +22,25 @@ Bem-vindo ao repositório do **Sistema de Diagnóstico de Ansiedade Fuzzy**! Est
 2. **Instale as Dependências:**:
 
    ```sh
-   pip install -r requirements.txt
+   pip install -r Requirements.txt
 
    ```
 
 3. **Execute o Programa**:
    ```sh
-   python diagnostico_ansiedade.py
+   python FuzzyAnxietyDiagnosis.py
    ```
 
 ## Estrutura do Projeto 📁
 
-    diagnostico_ansiedade.py: Script principal com a implementação do sistema de diagnóstico.
+    FuzzyAnxietyDiagnosis.py: Script principal com a implementação do sistema de diagnóstico.
     README.md: Instruções e informações sobre o projeto.
-    requirements.txt: Lista de dependências necessárias.
+    Requirements.txt: Lista de dependências necessárias.
 
 ## Exemplo de Uso 📊
 
     ```sh
-    from diagnostico_ansiedade import DiagnosticoAnsiedadeFuzzy
+    from FuzzyAnxietyDiagnosis import DiagnosticoAnsiedadeFuzzy
 
     diagnostico = DiagnosticoAnsiedadeFuzzy()
     resultado = diagnostico.diagnostico_ansiedade(80, 5, 5, 5)
